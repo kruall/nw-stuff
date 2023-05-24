@@ -1,0 +1,3 @@
+PyNaCl
+requests
+boto3
