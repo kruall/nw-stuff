@@ -161,4 +161,4 @@ cython_debug/
 
 resources/
 out/
-scripts/variables.sh
+configs/
