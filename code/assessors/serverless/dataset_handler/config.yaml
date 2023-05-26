@@ -1,0 +1,3 @@
+entrypoint: "index.handler"
+runtime: "python39"
+description: "Function for list/get datasets"
