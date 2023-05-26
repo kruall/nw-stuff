@@ -2,3 +2,4 @@ profiles:
   - name: code-uploader
     aws_access_key_id: "<key-id>"
     aws_secret_access_key: "<access-key>"
+    s3_bucket: "<bucket-for-code>"
