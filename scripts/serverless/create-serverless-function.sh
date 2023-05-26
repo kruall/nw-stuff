@@ -13,10 +13,10 @@ pushd `dirname "$0"`/.. > /dev/null
 path_to_project="code/${project}"
 path_to_function="${path_to_project}/serverless/${function_name}"
 
-if [ -f scripts/variables.sh ] ; then
-    . scripts/variables.sh
+if [ -f configs/variables.sh ] ; then
+    . configs/variables.sh
 else
-    echo "WARN: can't find the file with variables by path '$(readlink -f scripts/variables.sh)'"
+    echo "WARN: can't find the file with variables by path '`readlink -f .`/configs/variables.sh'"
 fi
 
 runtime=`cat $path_to_function/.config/runtime`

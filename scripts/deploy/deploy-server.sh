@@ -3,9 +3,9 @@
 pushd `dirname "$0"`/../..
 
 if [ -f scripts/variables.sh ] ; then
-    . scripts/variables.sh
+    . configs/variables.sh
 else
-    echo "WARN: can't find the file with variables by path '$(readlink -f scripts/variables.sh)'"
+    echo "WARN: can't find the file with variables by path '`readlink -f .`/configs/variables.sh'"
 fi
 
 mkdir -p out
