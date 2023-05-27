@@ -1,15 +1,27 @@
+import inspect
 import os
-import json
 import sys
+
+current_script_path = inspect.getframeinfo(inspect.currentframe()).filename
+deploy_tool_path = os.path.dirname(os.path.abspath(current_script_path))
+tools_path = os.path.dirname(deploy_tool_path)
+sys.path.insert(1, tools_path)
+
+
+
+import json
 import argparse
 import shutil
 import hashlib
 import zipfile
 import glob
 
-import util
-import shell
-import object_storage
+assert os.path.basename(deploy_tool_path) == 'deploy', "expected this script are in deploy"
+assert os.path.basename(tools_path) == 'tools', "expected this script are in tools"
+
+import core.util as util
+import core.shell as shell
+import core.object_storage as object_storage
 
 import yaml
 

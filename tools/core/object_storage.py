@@ -1,7 +1,6 @@
 import boto3
-import yaml
 
-import util
+import core.util as util
 
 
 def assert_has_field(profile, field):

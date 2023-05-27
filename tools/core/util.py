@@ -12,9 +12,12 @@ except ImportError:
 
 
 current_script_path = inspect.getframeinfo(inspect.currentframe()).filename
-deploy_tool_path = os.path.dirname(os.path.abspath(current_script_path))
+core_path = os.path.dirname(os.path.abspath(current_script_path))
+tools_path = os.path.dirname(core_path)
 
-tools_path = os.path.dirname(deploy_tool_path)
+assert os.path.basename(core_path) == 'core', "expected this script are in core"
+assert os.path.basename(tools_path) == 'tools', "expected this script are in tools"
+
 global_path = os.path.dirname(tools_path)
 
 projects_path = os.path.join(global_path, 'projects')
@@ -26,8 +29,6 @@ configs_path = os.path.join(global_path, 'configs')
 profiles_path = os.path.join(configs_path, 'profiles.yaml')
 
 
-assert os.path.basename(deploy_tool_path) == 'deploy', "expected this script are in deploy"
-assert os.path.basename(tools_path) == 'tools', "expected this script are in tools"
 assert os.path.isdir(projects_path), f"expected projects directory '{projects_path}"
 assert os.path.isdir(scripts_path), f"expected scripts directory '{scripts_path}"
 
