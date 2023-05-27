@@ -33,6 +33,22 @@ assert os.path.isdir(projects_path), f"expected projects directory '{projects_pa
 assert os.path.isdir(scripts_path), f"expected scripts directory '{scripts_path}"
 
 
+class HaltError(Exception):
+    def __init__(self, message, extra_message=None):
+        if message is None:
+            message = extra_message
+            extra_message = None
+        self._message = message
+        self._extra_message = extra_message
+
+    def __str__(self):
+        if self._extra_message:
+            return f'ERROR: {self._message}\n{self._extra_message}'
+        if self._message:
+            return 'ERROR: ' + self._message
+        return 'HaltError'
+
+
 def assert_with_actions(expr, msg, action=None, extra_msg=None):
     if not expr:
         if action is not None:
@@ -40,17 +56,39 @@ def assert_with_actions(expr, msg, action=None, extra_msg=None):
         if not msg and extra_msg:
             msg = extra_msg
             extra_msg = None
-        if msg:
-            print(msg, file=sys.stderr)
-        else:
-            traceback.print_last()
-        if extra_msg:
-            print(extra_msg, file=sys.stderr)
-        sys.exit(1)
+        raise HaltError(msg, extra_msg)
+
+
+def validate_dir_existence(path, extra_msg=None):
+    assert_with_actions(os.path.isdir(path), f"Expected directory '{path}'.", extra_msg=extra_msg)
+
+
+def validate_file_existence(path, extra_msg=None):
+    assert_with_actions(os.path.isfile(path), f"Expected file '{path}'.", extra_msg=extra_msg)
+
+
+def validate_path_unexistence(path, extra_msg=None):
+    assert_with_actions(not os.path.exists(path), f"Unexpected existence '{path}'.", extra_msg=extra_msg)
+
+
+def catch_halt_error(main):
+    def wrapped(*args, **kwargs):
+        try:
+            main(*args, **kwargs)
+        except HaltError as Ex:
+            print(Ex, file=sys.stderr)
+            sys.exit(1)
+    return wrapped
 
 
 def load_profiles():
-    assert_with_actions(os.path.isfile(profiles_path), f"ERROR: Expected file '{profiles_path}")
+    assert_with_actions(os.path.isfile(profiles_path), f" Expected file '{profiles_path}'")
     with open(profiles_path, 'r') as file:
         yaml_file = yaml.load(file, Loader)
     return {x['name'] : x for x in yaml_file['profiles']}
+
+
+def get_profile(name):
+    profiles = load_profiles()
+    assert_with_actions(name in profiles, f"Expected profile {name} in file '{profiles_path}'")
+    return profiles[name]

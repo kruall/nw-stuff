@@ -8,6 +8,9 @@ tools_path = os.path.dirname(deploy_tool_path)
 sys.path.insert(1, tools_path)
 
 
+assert os.path.basename(deploy_tool_path) == 'deploy', "expected this script are in deploy"
+assert os.path.basename(tools_path) == 'tools', "expected this script are in tools"
+
 
 import json
 import argparse
@@ -15,9 +18,6 @@ import shutil
 import hashlib
 import zipfile
 import glob
-
-assert os.path.basename(deploy_tool_path) == 'deploy', "expected this script are in deploy"
-assert os.path.basename(tools_path) == 'tools', "expected this script are in tools"
 
 import core.util as util
 import core.shell as shell
@@ -30,17 +30,6 @@ try:
 except ImportError:
     from yaml import Loader, Dumper
 
-
-def validate_dir_existence(path, extra_msg=None):
-    util.assert_with_actions(os.path.isdir(path), f"ERROR: Expected directory '{path}'.", extra_msg=extra_msg)
-
-
-def validate_file_existence(path, extra_msg=None):
-    util.assert_with_actions(os.path.isfile(path), f"ERROR: Expected file '{path}'.", extra_msg=extra_msg)
-
-
-def validate_path_unexistence(path, extra_msg=None):
-    util.assert_with_actions(not os.path.exists(path), f"ERROR: Unexpected existence '{path}'.", extra_msg=extra_msg)
 
 
 def sha256sum(filename):
@@ -104,16 +93,16 @@ class LocalServerlessFunction:
             util.assert_with_actions(isinstance(value, expected_type), f"ERROR: Unexpected type '{type(value)}' of field '{field_name}', expected '{expected_type}")
 
     def validate_for_update(self):
-        validate_path_unexistence(util.out_path, extra_msg="Can't update function with existed 'out' directory. Complete previous operation.")
-        validate_dir_existence(util.projects_path, extra_msg="Can't update function without projects directory.")
-        validate_dir_existence(self.function_path, extra_msg="Can't update function without serverless directory.")
-        validate_file_existence(self.config_path, extra_msg="Can't update function without config.json.")
+        util.validate_path_unexistence(util.out_path, extra_msg="Can't update function with existed 'out' directory. Complete previous operation.")
+        util.validate_dir_existence(util.projects_path, extra_msg="Can't update function without projects directory.")
+        util.validate_dir_existence(self.function_path, extra_msg="Can't update function without serverless directory.")
+        util.validate_file_existence(self.config_path, extra_msg="Can't update function without config.json.")
         self.validate_config()
 
     def validate_for_creation(self):
-        validate_dir_existence(util.projects_path, extra_msg="Can't create function without projects directory.")
-        validate_dir_existence(self.function_path, extra_msg="Can't create function without serverless directory.")
-        validate_file_existence(self.config_path, extra_msg="Can't create function without config.json.")
+        util.validate_dir_existence(util.projects_path, extra_msg="Can't create function without projects directory.")
+        util.validate_dir_existence(self.function_path, extra_msg="Can't create function without serverless directory.")
+        util.validate_file_existence(self.config_path, extra_msg="Can't create function without config.json.")
         self.validate_config()
 
     def generate_yc_update_arguments(self):
@@ -220,6 +209,7 @@ def create_serverless_function(name, project):
     print('success')
 
 
+@util.catch_halt_error
 def main(args):
     if args.global_command == 'delete':
         delete_serverless_function(args.name)
