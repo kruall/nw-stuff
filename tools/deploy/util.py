@@ -14,22 +14,22 @@ except ImportError:
 current_script_path = inspect.getframeinfo(inspect.currentframe()).filename
 deploy_tool_path = os.path.dirname(os.path.abspath(current_script_path))
 
-global_path = os.path.dirname(deploy_tool_path)
+tools_path = os.path.dirname(deploy_tool_path)
+global_path = os.path.dirname(tools_path)
 
-projects_path = os.path.join(global_path, 'code')
+projects_path = os.path.join(global_path, 'projects')
 scripts_path = os.path.join(global_path, 'scripts')
 resources_path = os.path.join(global_path, 'resources')
 out_path = os.path.join(global_path, 'out')
-out_projects_path = os.path.join(out_path, 'code')
+out_projects_path = os.path.join(out_path, 'projects')
 configs_path = os.path.join(global_path, 'configs')
 profiles_path = os.path.join(configs_path, 'profiles.yaml')
 
 
-assert os.path.basename(deploy_tool_path) == 'deploy-tool', "expected this script are in deploy-tool"
-assert os.path.isdir(projects_path), f"expected code directory '{projects_path}"
+assert os.path.basename(deploy_tool_path) == 'deploy', "expected this script are in deploy"
+assert os.path.basename(tools_path) == 'tools', "expected this script are in tools"
+assert os.path.isdir(projects_path), f"expected projects directory '{projects_path}"
 assert os.path.isdir(scripts_path), f"expected scripts directory '{scripts_path}"
-
-s3_code_package = 'code-package'
 
 
 def assert_with_actions(expr, msg, action=None, extra_msg=None):

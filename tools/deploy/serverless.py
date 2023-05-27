@@ -46,7 +46,7 @@ class LocalServerlessFunction:
         self._project = project
         self._name = name
         self.project_path = os.path.join(util.projects_path, project)
-        self.function_path = os.path.join(self.project_path, 'serverless', name)
+        self.function_path = os.path.join(self.project_path, 'serverless', name.replace('-', '_'))
         self.config_path = os.path.join(self.function_path, 'config.yaml')
 
         self._config = None
@@ -60,8 +60,8 @@ class LocalServerlessFunction:
             if 'entrypoint' in self._config:
                 entrypoint = self._config['entrypoint']
                 rel_path = os.path.relpath(self.function_path, util.projects_path)
-                print(rel_path)
-                self._config['entrypoint'] = f'{str(rel_path).replace("/", ".")}.{entrypoint}'
+                prepared_rel_path = str(rel_path).replace("/", ".")
+                self._config['entrypoint'] = f'{prepared_rel_path}.{entrypoint}'
         return self._config
 
     def validate_config(self):
@@ -93,13 +93,13 @@ class LocalServerlessFunction:
 
     def validate_for_update(self):
         validate_path_unexistence(util.out_path, extra_msg="Can't update function with existed 'out' directory. Complete previous operation.")
-        validate_dir_existence(util.projects_path, extra_msg="Can't update function without code directory.")
+        validate_dir_existence(util.projects_path, extra_msg="Can't update function without projects directory.")
         validate_dir_existence(self.function_path, extra_msg="Can't update function without serverless directory.")
         validate_file_existence(self.config_path, extra_msg="Can't update function without config.json.")
         self.validate_config()
 
     def validate_for_creation(self):
-        validate_dir_existence(util.projects_path, extra_msg="Can't create function without code directory.")
+        validate_dir_existence(util.projects_path, extra_msg="Can't create function without projects directory.")
         validate_dir_existence(self.function_path, extra_msg="Can't create function without serverless directory.")
         validate_file_existence(self.config_path, extra_msg="Can't create function without config.json.")
         self.validate_config()
@@ -153,6 +153,8 @@ class LocalServerlessFunction:
         self._bucket = code_uploader._bucket
         if not code_uploader.is_exist(self._archive_name):
             code_uploader.upload(archive_path, self._archive_name)
+        else:
+            print('INFO: archive already uploaded')
 
     def upload_code(self):
         os.makedirs(util.out_path)
